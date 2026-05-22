@@ -15,7 +15,7 @@
       "framework": "ASP.NET Core Web API",
       "targetFramework": "net10.0",
       "entry": "backend/Program.cs",
-      "projectFile": "backend/LearningApi.csproj",
+      "projectFile": "backend/BrightPath.csproj",
       "packages": {
         "BCrypt.Net-Next": "4.1.0",
         "Microsoft.AspNetCore.Authentication.JwtBearer": "10.0.7",
