@@ -114,6 +114,13 @@
                 <td>{{ enrollment.courseName }}</td>
                 <td>{{ enrollment.enrollmentDate | date: 'mediumDate' }}</td>
                 <td class="table-actions">
+                  <a
+                    class="button button-secondary button-small"
+                    [routerLink]="['/dashboard/enrollments', enrollment.enrollmentID]"
+                  >
+                    View
+                  </a>
+
                   @if (authService.hasRole('Admin')) {
                     <button
                       class="button button-danger button-small"
@@ -143,7 +150,24 @@
         Prev
       </button>
 
-      <span>Page {{ page() }} / {{ totalPages() }}</span>
+      <div class="pagination-pages" aria-label="Enrollment pages">
+        @for (item of paginationItems(); track $index + '-' + item) {
+          @if (item === 'ellipsis') {
+            <span class="pagination-ellipsis" aria-hidden="true">...</span>
+          } @else {
+            <button
+              type="button"
+              class="pagination-page"
+              [class.is-active]="item === page()"
+              [attr.aria-current]="item === page() ? 'page' : null"
+              [attr.aria-label]="'Go to page ' + item"
+              (click)="goToPage(item)"
+            >
+              {{ item }}
+            </button>
+          }
+        }
+      </div>
 
       <button
         class="button button-secondary button-small"

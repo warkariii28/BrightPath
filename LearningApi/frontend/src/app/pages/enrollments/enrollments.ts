@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../core/services/auth.service';
 import { EnrollmentService } from '../../core/services/enrollment.service';
@@ -8,10 +8,11 @@ import { ConfirmService } from '../../core/services/confirm.service';
 import { Enrollment } from '../../core/models/enrollment';
 import { SkeletonTableComponent } from '../../core/components/skeleton-table/skeleton-table';
 import { PageHeaderComponent } from '../../shared/page-header/page-header';
+import { getPaginationItems } from '../../core/utils/paginate';
 
 @Component({
   selector: 'app-enrollments',
-  imports: [DatePipe, SkeletonTableComponent, PageHeaderComponent],
+  imports: [DatePipe, RouterLink, SkeletonTableComponent, PageHeaderComponent],
   templateUrl: './enrollments.html',
 })
 export class Enrollments implements OnInit {
@@ -31,6 +32,7 @@ export class Enrollments implements OnInit {
 
   // ✅ Total pages
   readonly totalPages = computed(() => Math.max(1, Math.ceil(this.totalCount() / this.pageSize())));
+  readonly paginationItems = computed(() => getPaginationItems(this.page(), this.totalPages()));
 
   // ✅ Paginated data
   readonly paged = computed(() => this.filtered());
@@ -82,6 +84,13 @@ export class Enrollments implements OnInit {
   prevPage(): void {
     if (this.page() > 1) {
       this.page.update((p) => p - 1);
+      this.loadEnrollments();
+    }
+  }
+
+  goToPage(pageNumber: number): void {
+    if (pageNumber !== this.page() && pageNumber >= 1 && pageNumber <= this.totalPages()) {
+      this.page.set(pageNumber);
       this.loadEnrollments();
     }
   }

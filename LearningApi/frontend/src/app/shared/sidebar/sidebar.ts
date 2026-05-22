@@ -15,6 +15,7 @@ import {
   Plus,
   ShieldCheck,
   UserCog,
+  LayoutDashboard,
 } from 'lucide-angular';
 import { Student } from '../../core/models/student';
 import { Course } from '../../core/models/course';
@@ -45,6 +46,7 @@ export class Sidebar implements OnInit, OnDestroy {
   readonly isCollapsed = signal(false);
   readonly ShieldCheck = ShieldCheck;
   readonly UserCog = UserCog;
+  readonly LayoutDashboard = LayoutDashboard;
 
   toggleCollapse(): void {
     this.isCollapsed.update((v) => !v);
@@ -118,8 +120,14 @@ export class Sidebar implements OnInit, OnDestroy {
 
   menu = [
     {
-      label: 'Students',
+      label: 'Dashboard',
       route: '/dashboard',
+      icon: this.LayoutDashboard,
+      roles: ['User', 'Admin'],
+    },
+    {
+      label: 'Students',
+      route: '/dashboard/students',
       icon: this.Users,
       roles: ['User', 'Admin'],
     },
@@ -140,7 +148,7 @@ export class Sidebar implements OnInit, OnDestroy {
   quickActions = [
     {
       label: 'Student',
-      route: '/dashboard/add',
+      route: '/dashboard/students/add',
       icon: this.Plus,
       roles: ['Admin'],
     },

@@ -9,12 +9,22 @@
     </div>
 
     <div class="hero-actions">
-      @if (activeSection() !== 'students') {
+      @if (activeSection() !== 'dashboard') {
         <a
           class="button button-secondary"
           routerLink="/dashboard"
           routerLinkActive="button-active"
           [routerLinkActiveOptions]="{ exact: true }"
+        >
+          Dashboard
+        </a>
+      }
+
+      @if (activeSection() !== 'students') {
+        <a
+          class="button button-secondary"
+          routerLink="/dashboard/students"
+          routerLinkActive="button-active"
         >
           Students
         </a>

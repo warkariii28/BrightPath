@@ -81,7 +81,7 @@ export class StudentForm implements OnInit {
         .subscribe({
           next: (msg) => {
             this.toast.success(msg || 'Student updated');
-            this.router.navigate(['/dashboard']);
+            this.router.navigate(['/dashboard/students']);
           },
           error: (err) => {
             this.validationErrors = err.error?.data ?? null;
@@ -98,7 +98,7 @@ export class StudentForm implements OnInit {
       .subscribe({
         next: () => {
           this.toast.success('Student added');
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/dashboard/students']);
         },
         error: (err) => {
           this.validationErrors = err.error?.data ?? null;

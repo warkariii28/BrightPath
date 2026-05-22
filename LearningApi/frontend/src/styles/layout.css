@@ -114,7 +114,7 @@
 }
 
 .table-scroll table {
-  min-width: var(--table-min-width);
+  min-width: min(100%, var(--table-min-width));
 }
 
 .section-header {
@@ -124,7 +124,7 @@
   justify-content: space-between;
   gap: var(--space-4);
   padding: 0 var(--space-2) var(--space-4);
-  min-height: 3rem;
+  min-height: 0;
 }
 
 .section-header > * {
@@ -218,12 +218,18 @@
   .section-header {
     flex-direction: column;
     align-items: flex-start;
+    padding-inline: 0;
   }
 
   .hero-actions > *,
   .toolbar > *,
   .actions-row > * {
     width: 100%;
+  }
+
+  .table-scroll {
+    margin-inline: calc(var(--space-2) * -1);
+    padding-inline: var(--space-2);
   }
 }
 
@@ -250,5 +256,10 @@
   .hero-panel::after {
     width: 180px;
     height: 180px;
+  }
+
+  .table-scroll
+  {
+    margin-inline: 0;
   }
 }

@@ -101,7 +101,20 @@
           Prev
         </button>
 
-        <span>Page {{ page() }} / {{ totalPages() }}</span>
+        <div class="pagination-pages" aria-label="Audit log pages">
+          @for (pageNumber of pageNumbers(); track pageNumber) {
+            <button
+              type="button"
+              class="pagination-page"
+              [class.is-active]="pageNumber === page()"
+              [attr.aria-current]="pageNumber === page() ? 'page' : null"
+              [attr.aria-label]="'Go to page ' + pageNumber"
+              (click)="goToPage(pageNumber)"
+            >
+              {{ pageNumber }}
+            </button>
+          }
+        </div>
 
         <button
           class="button button-secondary button-small"

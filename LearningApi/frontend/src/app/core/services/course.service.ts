@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap, of, shareReplay, finalize, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { Course, CoursePayload } from '../models/course';
+import { Course, CoursePayload, CourseProfile } from '../models/course';
 import { PagedResult } from '../models/api-response';
 import { BaseApiService } from './base-api.service';
 
@@ -81,6 +81,10 @@ export class CourseService extends BaseApiService {
 
   getCourse(id: number): Observable<Course> {
     return this.get<Course>(`${this.apiUrl}/${id}`);
+  }
+
+  getCourseProfile(id: number): Observable<CourseProfile> {
+    return this.get<CourseProfile>(`${this.apiUrl}/${id}/profile`);
   }
 
   addCourse(payload: CoursePayload): Observable<number> {

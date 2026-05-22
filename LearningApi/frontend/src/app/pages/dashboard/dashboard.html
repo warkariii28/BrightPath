@@ -1,133 +1,199 @@
 <main class="page-shell dashboard-grid">
   <app-page-header
-    activeSection="students"
-    eyebrow="Student records"
-    title="Students dashboard"
-    description="Manage learner profiles, contact details, and enrollment readiness."
-    statusLabel="System status"
-    [statusTitle]="loading() ? 'Loading students' : error() ? 'Needs attention' : 'Ready'"
-    statusDescription="Student records are synced and ready for management."
-    [showAdminAction]="authService.hasRole('Admin')"
-    primaryActionLabel="Add student"
-    primaryActionLink="/dashboard/add"
+    activeSection="dashboard"
+    eyebrow="Program overview"
+    title="Dashboard"
+    description="Track learning activity, revenue, growth, recent registrations, and admin work from one clean overview."
+    statusLabel="Dashboard status"
+    [statusTitle]="loading() ? 'Loading overview' : error() ? 'Needs attention' : 'Ready'"
+    statusDescription="Dashboard analytics are separated from roster management so each page has one job."
+    [showAdminAction]="false"
   />
 
-  <section class="surface section-card">
-    <div class="metric-grid">
+  <section class="surface section-card dashboard-summary">
+    <div class="metric-grid dashboard-metric-grid">
       <article class="metric">
         <span>Total students</span>
-        <strong>{{ students().length }}</strong>
+        <strong>{{ analytics()?.totalStudents ?? totalCount() }}</strong>
       </article>
       <article class="metric">
-        <span>Status</span>
-        <strong>{{ loading() ? 'Loading' : error() ? 'Attention' : 'Ready' }}</strong>
+        <span>Total courses</span>
+        <strong>{{ analytics()?.totalCourses ?? courses().length }}</strong>
       </article>
       <article class="metric">
-        <span>Catalog mode</span>
-        <strong>Active</strong>
+        <span>Enrollments</span>
+        <strong>{{ analytics()?.totalEnrollments ?? enrollments().length }}</strong>
+      </article>
+      <article class="metric">
+        <span>Total revenue</span>
+        <strong>{{ (analytics()?.totalRevenue ?? 0) | currency: 'INR' : 'symbol' : '1.0-2' }}</strong>
+      </article>
+      <article class="metric">
+        <span>Admin actions</span>
+        <strong>{{ analytics()?.adminActionsThisWeek ?? 0 }}</strong>
       </article>
     </div>
   </section>
+
+  <section class="surface section-card dashboard-activity">
+    <div class="section-header">
+      <div>
+        <p class="badge">Program analytics</p>
+        <h2>Learning activity</h2>
+      </div>
+    </div>
+
+    <div class="module-grid dashboard-module-grid">
+      <article class="module-card">
+        <div>
+          <p class="badge">Recent</p>
+          <h3>New registrations</h3>
+        </div>
+
+        @if (loading()) {
+          <app-skeleton-table [rows]="3" [cols]="2"></app-skeleton-table>
+        } @else if ((analytics()?.recentEnrollments?.length ?? 0) === 0) {
+          <p class="muted-text">No recent enrollments yet.</p>
+        } @else {
+          @for (enrollment of analytics()!.recentEnrollments; track enrollment.enrollmentID) {
+            <div class="mini-panel">
+              <strong>{{ enrollment.studentName }}</strong>
+              <span>
+                {{ enrollment.courseName }} - {{ enrollment.enrollmentDate | date: 'mediumDate' }}
+              </span>
+            </div>
+          }
+        }
+      </article>
+
+      <article class="module-card">
+        <div>
+          <p class="badge">Popular</p>
+          <h3>Top courses</h3>
+        </div>
+
+        @if (loading()) {
+          <app-skeleton-table [rows]="3" [cols]="2"></app-skeleton-table>
+        } @else if ((analytics()?.popularCourses?.length ?? 0) === 0) {
+          <p class="muted-text">No course activity yet.</p>
+        } @else {
+          @for (course of analytics()!.popularCourses; track course.courseID) {
+            <div class="mini-panel">
+              <strong>{{ course.courseName }}</strong>
+              <span>
+                {{ course.enrollmentCount }} students -
+                {{ course.revenue | currency: 'INR' : 'symbol' : '1.0-2' }}
+              </span>
+            </div>
+          }
+        }
+      </article>
+
+      <article class="module-card">
+        <div>
+          <p class="badge">Growth</p>
+          <h3>Student growth</h3>
+        </div>
+
+        @if (loading()) {
+          <app-skeleton-table [rows]="3" [cols]="2"></app-skeleton-table>
+        } @else if ((analytics()?.studentGrowth?.length ?? 0) === 0) {
+          <p class="muted-text">No growth data yet.</p>
+        } @else {
+          @for (point of analytics()!.studentGrowth; track point.period) {
+            <div class="mini-panel">
+              <strong>{{ point.period }}</strong>
+              <span>{{ point.studentCount }} students joined</span>
+            </div>
+          }
+        }
+      </article>
+
+      <article class="module-card">
+        <div>
+          <p class="badge">New</p>
+          <h3>Recent students</h3>
+        </div>
+
+        @if (loading()) {
+          <app-skeleton-table [rows]="3" [cols]="2"></app-skeleton-table>
+        } @else if ((analytics()?.recentStudents?.length ?? 0) === 0) {
+          <p class="muted-text">No recent student records yet.</p>
+        } @else {
+          @for (student of analytics()!.recentStudents; track student.studentID) {
+            <a class="mini-panel" [routerLink]="['/dashboard/students', student.studentID]">
+              <strong>{{ student.name }}</strong>
+              <span>{{ student.email }} - {{ student.createdAt | date: 'mediumDate' }}</span>
+            </a>
+          }
+        }
+      </article>
+
+      <article class="module-card">
+        <div>
+          <p class="badge">Admin</p>
+          <h3>Actions this week</h3>
+        </div>
+
+        @if (loading()) {
+          <app-skeleton-table [rows]="3" [cols]="2"></app-skeleton-table>
+        } @else if ((analytics()?.recentAdminActions?.length ?? 0) === 0) {
+          <p class="muted-text">No recent admin actions yet.</p>
+        } @else {
+          @for (action of analytics()!.recentAdminActions; track action.auditLogID) {
+            <div class="mini-panel">
+              <strong>{{ action.action }}</strong>
+              <span>{{ action.entityName }} by {{ action.adminName }} - {{ action.createdAt | date: 'mediumDate' }}</span>
+            </div>
+          }
+        }
+      </article>
+    </div>
+  </section>
+
+  @if (analyticsError()) {
+    <section class="status-banner">
+      {{ analyticsError() }} Use the Students page for roster management.
+    </section>
+  }
 
   @if (error()) {
     <section class="status-banner status-error">
       {{ error() }}
     </section>
   }
-
-  <section class="surface table-section" [attr.aria-busy]="loading()">
+  <section class="surface section-card dashboard-workspaces">
     <div class="section-header">
       <div>
-        <p class="badge">Student records</p>
-        <h2>Current roster</h2>
-      </div>
-
-      <div class="toolbar">
-        <input
-          type="search"
-          placeholder="Search students..."
-          [value]="query()"
-          (input)="setQuery($any($event.target).value)"
-          class="input"
-        />
-        <!-- <small class="muted-text">Search applies to the current page.</small> -->
-
-        <button
-          class="button button-secondary"
-          type="button"
-          (click)="loadDashboard()"
-          [disabled]="loading()"
-        >
-          Refresh
-        </button>
+        <p class="badge">Management</p>
+        <h2>Open a workspace</h2>
       </div>
     </div>
 
-    <div class="table-scroll">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+    <div class="module-grid workspace-grid">
+      <a class="module-card" routerLink="/dashboard/students">
+        <div>
+          <p class="badge">Roster</p>
+          <h3>Students</h3>
+        </div>
+        <p class="muted-text">Search, view, edit, and manage learner profiles.</p>
+      </a>
 
-        <tbody>
-          @if (loading()) {
-            <tr>
-              <td colspan="4">
-                <app-skeleton-table [rows]="5" [cols]="4"></app-skeleton-table>
-              </td>
-            </tr>
-          } @else if (filteredStudents().length === 0) {
-            <tr>
-              <td colspan="4" class="table-state">
-                @if (query()) {
-                  No students match "{{ query() }}".
-                } @else {
-                  No students have been added yet.
-                }
-              </td>
-            </tr>
-          } @else {
-            @for (student of pagedStudents(); track student.studentID) {
-              <tr>
-                <td>{{ student.studentID }}</td>
-                <td>{{ student.name }}</td>
-                <td>{{ student.email }}</td>
-                <td class="table-actions">
-                  @if (authService.hasRole('Admin')) {
-                    <a
-                      class="button button-secondary button-small"
-                      [routerLink]="['/dashboard/edit', student.studentID]"
-                    >
-                      Edit
-                    </a>
+      <a class="module-card" routerLink="/dashboard/courses">
+        <div>
+          <p class="badge">Catalog</p>
+          <h3>Courses</h3>
+        </div>
+        <p class="muted-text">Manage course fees, durations, and enrolled students.</p>
+      </a>
 
-                    <button
-                      class="button button-danger button-small"
-                      type="button"
-                      (click)="deleteStudent(student)"
-                    >
-                      Delete
-                    </button>
-                  } @else {
-                    <span class="muted-text">View only</span>
-                  }
-                </td>
-              </tr>
-            }
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <div class="pagination">
-      <button (click)="prevPage()" [disabled]="page() === 1">Prev</button>
-      <span>Page {{ page() }} / {{ totalPages() }}</span>
-      <button (click)="nextPage()" [disabled]="page() === totalPages()">Next</button>
+      <a class="module-card" routerLink="/dashboard/enrollments">
+        <div>
+          <p class="badge">Activity</p>
+          <h3>Enrollments</h3>
+        </div>
+        <p class="muted-text">Connect students to courses and review registrations.</p>
+      </a>
     </div>
   </section>
 </main>

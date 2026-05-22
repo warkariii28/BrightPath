@@ -4,6 +4,7 @@ import { authGuard } from './core/guards/auth.guard';
 import { CourseForm } from './pages/course-form/course-form';
 import { Courses } from './pages/courses/courses';
 import { Dashboard } from './pages/dashboard/dashboard';
+import { Students } from './pages/students/students';
 import { EnrollmentForm } from './pages/enrollment-form/enrollment-form';
 import { Enrollments } from './pages/enrollments/enrollments';
 import { Login } from './pages/login/login';
@@ -14,6 +15,9 @@ import { AppLayoutComponent } from './layouts/app-layout/app-layout';
 import { AdminAuditLogs } from './pages/admin-audit-logs/admin-audit-logs';
 import { Users } from './pages/users/users';
 import { AppRoles } from './core/constants/app-roles';
+import { StudentProfilePage } from './pages/student-profile/student-profile';
+import { CourseProfilePage } from './pages/course-profile/course-profile';
+import { EnrollmentProfilePage } from './pages/enrollment-profile/enrollment-profile';
 
 export const routes: Routes = [
   // Redirect root
@@ -35,19 +39,34 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: '', component: Dashboard },
+      { path: 'students', component: Students },
 
       // ADMIN ONLY
       {
         path: 'add',
+        redirectTo: 'students/add',
+        pathMatch: 'full',
+      },
+      {
+        path: 'edit/:id',
+        redirectTo: 'students/edit/:id',
+        pathMatch: 'full',
+      },
+      {
+        path: 'students/add',
         component: StudentForm,
         canActivate: [roleGuard],
         data: { roles: [AppRoles.Admin] },
       },
       {
-        path: 'edit/:id',
+        path: 'students/edit/:id',
         component: StudentForm,
         canActivate: [roleGuard],
         data: { roles: [AppRoles.Admin] },
+      },
+      {
+        path: 'students/:id',
+        component: StudentProfilePage,
       },
       {
         path: 'audit-logs',
@@ -79,6 +98,10 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { roles: [AppRoles.Admin] },
       },
+      {
+        path: 'courses/:id',
+        component: CourseProfilePage,
+      },
 
       // VIEW ALLOWED
       {
@@ -91,6 +114,10 @@ export const routes: Routes = [
         component: EnrollmentForm,
         canActivate: [roleGuard],
         data: { roles: [AppRoles.Admin] },
+      },
+      {
+        path: 'enrollments/:id',
+        component: EnrollmentProfilePage,
       },
     ],
   },

@@ -1,7 +1,7 @@
 import { Component, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
-type HeaderSection = 'students' | 'courses' | 'enrollments';
+type HeaderSection = 'dashboard' | 'students' | 'courses' | 'enrollments';
 
 @Component({
   selector: 'app-page-header',

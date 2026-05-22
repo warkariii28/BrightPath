@@ -9,6 +9,7 @@ import { ToastService } from '../../core/services/toast.service';
 import { ConfirmService } from '../../core/services/confirm.service';
 import { SkeletonTableComponent } from '../../core/components/skeleton-table/skeleton-table';
 import { PageHeaderComponent } from '../../shared/page-header/page-header';
+import { getPaginationItems } from '../../core/utils/paginate';
 
 @Component({
   selector: 'app-courses',
@@ -28,6 +29,7 @@ export class Courses implements OnInit {
   readonly filteredCourses = computed(() => this.courses());
 
   readonly totalPages = computed(() => Math.max(1, Math.ceil(this.totalCount() / this.pageSize())));
+  readonly paginationItems = computed(() => getPaginationItems(this.page(), this.totalPages()));
 
   readonly pagedCourses = computed(() => this.filteredCourses());
 
@@ -93,6 +95,13 @@ export class Courses implements OnInit {
   prevPage() {
     if (this.page() > 1) {
       this.page.update((p) => p - 1);
+      this.loadCourses();
+    }
+  }
+
+  goToPage(pageNumber: number) {
+    if (pageNumber !== this.page() && pageNumber >= 1 && pageNumber <= this.totalPages()) {
+      this.page.set(pageNumber);
       this.loadCourses();
     }
   }

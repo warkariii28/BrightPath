@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap, of, shareReplay, finalize, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { Enrollment, EnrollmentPayload } from '../models/enrollment';
+import { Enrollment, EnrollmentDetail, EnrollmentPayload } from '../models/enrollment';
 import { PagedResult } from '../models/api-response';
 import { BaseApiService } from './base-api.service';
 
@@ -78,6 +78,10 @@ export class EnrollmentService extends BaseApiService {
 
   hasEnrollments(): boolean {
     return this.enrollmentsSubject.value.length > 0;
+  }
+
+  getEnrollment(id: number): Observable<EnrollmentDetail> {
+    return this.get<EnrollmentDetail>(`${this.apiUrl}/${id}`);
   }
 
   addEnrollment(payload: EnrollmentPayload): Observable<number> {

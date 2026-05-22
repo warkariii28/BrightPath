@@ -22,6 +22,9 @@ export class AdminAuditLogs implements OnInit {
   readonly pageSize = signal(10);
 
   readonly totalPages = computed(() => Math.max(1, Math.ceil(this.totalCount() / this.pageSize())));
+  readonly pageNumbers = computed(() =>
+    Array.from({ length: this.totalPages() }, (_, index) => index + 1),
+  );
 
   ngOnInit(): void {
     this.loadLogs();
@@ -58,6 +61,13 @@ export class AdminAuditLogs implements OnInit {
   prevPage(): void {
     if (this.page() > 1) {
       this.page.update((p) => p - 1);
+      this.loadLogs();
+    }
+  }
+
+  goToPage(pageNumber: number): void {
+    if (pageNumber !== this.page() && pageNumber >= 1 && pageNumber <= this.totalPages()) {
+      this.page.set(pageNumber);
       this.loadLogs();
     }
   }

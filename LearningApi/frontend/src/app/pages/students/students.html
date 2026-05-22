@@ -1,30 +1,30 @@
 <main class="page-shell dashboard-grid">
   <app-page-header
-    activeSection="courses"
-    eyebrow="Course catalog"
-    title="Courses dashboard"
-    description="Keep course names, fees, and durations ready for enrollment."
-    statusLabel="Course status"
-    [statusTitle]="loading() ? 'Syncing catalog' : error() ? 'Needs attention' : 'Ready to publish'"
-    statusDescription="Courses feed directly into the enrollment flow, so keeping catalog details current matters across the app."
+    activeSection="students"
+    eyebrow="Student records"
+    title="Students"
+    description="Manage learner profiles, contact details, and enrollment readiness."
+    statusLabel="Student status"
+    [statusTitle]="loading() ? 'Loading students' : error() ? 'Needs attention' : 'Ready'"
+    statusDescription="Student records are separated from dashboard analytics so roster work stays focused."
     [showAdminAction]="authService.hasRole('Admin')"
-    primaryActionLabel="Add course"
-    primaryActionLink="/dashboard/courses/add"
+    primaryActionLabel="Add student"
+    primaryActionLink="/dashboard/students/add"
   />
 
   <section class="surface section-card">
     <div class="metric-grid">
       <article class="metric">
-        <span>Total courses</span>
+        <span>Total students</span>
         <strong>{{ totalCount() }}</strong>
+      </article>
+      <article class="metric">
+        <span>Page</span>
+        <strong>{{ page() }} / {{ totalPages() }}</strong>
       </article>
       <article class="metric">
         <span>Status</span>
         <strong>{{ loading() ? 'Loading' : error() ? 'Attention' : 'Ready' }}</strong>
-      </article>
-      <article class="metric">
-        <span>Catalog mode</span>
-        <strong>Active</strong>
       </article>
     </div>
   </section>
@@ -36,27 +36,25 @@
   }
 
   <section class="surface table-section" [attr.aria-busy]="loading()">
-    <!-- HEADER + SEARCH -->
     <div class="section-header">
       <div>
-        <p class="badge">Course records</p>
-        <h2>Current catalog</h2>
+        <p class="badge">Student records</p>
+        <h2>Current roster</h2>
       </div>
 
       <div class="toolbar">
         <input
           type="search"
-          placeholder="Search courses..."
+          placeholder="Search students..."
           [value]="query()"
           (input)="setQuery($any($event.target).value)"
           class="input"
         />
-        <!-- <small class="muted-text">Search applies to the current page.</small> -->
 
         <button
           class="button button-secondary"
           type="button"
-          (click)="loadCourses()"
+          (click)="loadStudents()"
           [disabled]="loading()"
         >
           Refresh
@@ -69,48 +67,39 @@
         <thead>
           <tr>
             <th>ID</th>
-            <th>Course</th>
-            <th>Fee</th>
-            <th>Duration</th>
+            <th>Name</th>
+            <th>Email</th>
             <th>Actions</th>
           </tr>
         </thead>
 
         <tbody>
-          <!-- LOADING -->
           @if (loading()) {
             <tr>
-              <td colspan="5">
-                <app-skeleton-table [rows]="5" [cols]="5"></app-skeleton-table>
+              <td colspan="4">
+                <app-skeleton-table [rows]="5" [cols]="4"></app-skeleton-table>
               </td>
             </tr>
-          }
-
-          <!-- EMPTY -->
-          @else if (filteredCourses().length === 0) {
+          } @else if (filteredStudents().length === 0) {
             <tr>
-              <td colspan="5" class="table-state">
+              <td colspan="4" class="table-state">
                 @if (query()) {
-                  No courses match "{{ query() }}".
+                  No students match "{{ query() }}".
                 } @else {
-                  No courses have been added yet.
+                  No students have been added yet.
                 }
               </td>
             </tr>
-          }
-
-          <!-- DATA -->
-          @else {
-            @for (course of pagedCourses(); track course.courseID) {
+          } @else {
+            @for (student of pagedStudents(); track student.studentID) {
               <tr>
-                <td>{{ course.courseID }}</td>
-                <td>{{ course.courseName }}</td>
-                <td>{{ course.fee | currency: 'INR' : 'symbol' : '1.0-2' }}</td>
-                <td>{{ course.durationWeeks }} weeks</td>
+                <td>{{ student.studentID }}</td>
+                <td>{{ student.name }}</td>
+                <td>{{ student.email }}</td>
                 <td class="table-actions">
                   <a
                     class="button button-secondary button-small"
-                    [routerLink]="['/dashboard/courses', course.courseID]"
+                    [routerLink]="['/dashboard/students', student.studentID]"
                   >
                     View
                   </a>
@@ -118,7 +107,7 @@
                   @if (authService.hasRole('Admin')) {
                     <a
                       class="button button-secondary button-small"
-                      [routerLink]="['/dashboard/courses/edit', course.courseID]"
+                      [routerLink]="['/dashboard/students/edit', student.studentID]"
                     >
                       Edit
                     </a>
@@ -126,13 +115,12 @@
                     <button
                       class="button button-danger button-small"
                       type="button"
-                      [disabled]="!authService.hasRole('Admin')"
-                      (click)="deleteCourse(course)"
+                      (click)="deleteStudent(student)"
                     >
                       Delete
                     </button>
                   } @else {
-                    <span class="muted-text">View Only</span>
+                    <span class="muted-text">View only</span>
                   }
                 </td>
               </tr>
@@ -142,11 +130,9 @@
       </table>
     </div>
 
-    <!-- PAGINATION -->
     <div class="pagination">
       <button (click)="prevPage()" [disabled]="page() === 1">Prev</button>
-
-      <div class="pagination-pages" aria-label="Course pages">
+      <div class="pagination-pages" aria-label="Student pages">
         @for (item of paginationItems(); track $index + '-' + item) {
           @if (item === 'ellipsis') {
             <span class="pagination-ellipsis" aria-hidden="true">...</span>
@@ -164,7 +150,6 @@
           }
         }
       </div>
-
       <button (click)="nextPage()" [disabled]="page() === totalPages()">Next</button>
     </div>
   </section>

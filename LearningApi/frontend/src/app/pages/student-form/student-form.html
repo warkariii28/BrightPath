@@ -17,12 +17,12 @@
           <span>{{
             isEditMode
               ? 'Update an existing record and save changes.'
-              : 'Add a new student to the dashboard list.'
+                : 'Add a new student to the roster.'
           }}</span>
         </article>
         <article class="mini-panel">
           <strong>Return path</strong>
-          <span>Cancel safely at any point and jump back to the dashboard roster.</span>
+          <span>Cancel safely at any point and jump back to the student roster.</span>
         </article>
       </div>
 
@@ -39,8 +39,7 @@
           <p class="badge">Roster control</p>
           <strong>Student records stay easy to review before anything is saved.</strong>
           <span
-            >Use this screen for focused edits while the dashboard remains the source of
-            truth.</span
+            >Use this screen for focused edits while the student roster stays clean.</span
           >
         </article>
       </div>
@@ -103,7 +102,7 @@
         >
           {{ isSubmitting ? 'Saving...' : 'Save student' }}
         </button>
-        <a class="button button-secondary" routerLink="/dashboard">Cancel</a>
+        <a class="button button-secondary" routerLink="/dashboard/students">Cancel</a>
       </div>
     </form>
   </section>

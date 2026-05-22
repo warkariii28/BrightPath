@@ -1,0 +1,125 @@
+<main class="page-shell dashboard-grid">
+  <app-page-header
+    activeSection="enrollments"
+    eyebrow="Enrollment details"
+    [title]="pageTitle()"
+    description="Review the learner, course, fee, duration, and registration timeline for this enrollment."
+    statusLabel="Enrollment status"
+    [statusTitle]="loading() ? 'Loading enrollment' : error() ? 'Needs attention' : 'Ready'"
+    statusDescription="Enrollment details connect the student record to the course catalog entry."
+    [showAdminAction]="authService.hasRole('Admin')"
+    primaryActionLabel="Add enrollment"
+    primaryActionLink="/dashboard/enrollments/add"
+  />
+
+  @if (error()) {
+    <section class="status-banner status-error">{{ error() }}</section>
+  }
+
+  @if (!error()) {
+    <section class="surface section-card" [attr.aria-busy]="loading()">
+      @if (loading()) {
+        <app-skeleton-table [rows]="1" [cols]="4"></app-skeleton-table>
+      } @else if (enrollment()) {
+        <div class="metric-grid profile-metric-grid">
+        <article class="metric">
+          <span>Enrollment ID</span>
+          <strong>{{ enrollment()!.enrollmentID }}</strong>
+        </article>
+        <article class="metric">
+          <span>Fee</span>
+          <strong>{{ enrollment()!.fee | currency: 'INR' : 'symbol' : '1.0-2' }}</strong>
+        </article>
+        <article class="metric">
+          <span>Duration</span>
+          <strong>{{ enrollment()!.durationWeeks }} weeks</strong>
+        </article>
+        <article class="metric">
+          <span>Enrollment date</span>
+          <strong>{{ enrollment()!.enrollmentDate | date: 'mediumDate' }}</strong>
+        </article>
+        <article class="metric">
+          <span>Status</span>
+          <strong>{{ enrollment()!.status }}</strong>
+        </article>
+        <article class="metric">
+          <span>Amount paid</span>
+          <strong>{{ enrollment()!.amountPaid | currency: 'INR' : 'symbol' : '1.0-2' }}</strong>
+        </article>
+        <article class="metric">
+          <span>Balance due</span>
+          <strong>{{ enrollment()!.balanceDue | currency: 'INR' : 'symbol' : '1.0-2' }}</strong>
+        </article>
+        </div>
+      }
+    </section>
+
+    <section class="surface table-section">
+    <div class="section-header">
+      <div>
+        <p class="badge">Connected records</p>
+        <h2>Student and course</h2>
+      </div>
+
+      <a class="button button-secondary" routerLink="/dashboard/enrollments">Back to enrollments</a>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Record</th>
+            <th>Name</th>
+            <th>Details</th>
+            <th>Profile</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @if (loading()) {
+            <tr>
+              <td colspan="4">
+                <app-skeleton-table [rows]="2" [cols]="4"></app-skeleton-table>
+              </td>
+            </tr>
+          } @else if (enrollment()) {
+            <tr>
+              <td>Student</td>
+              <td>{{ enrollment()!.studentName }}</td>
+              <td>{{ enrollment()!.studentEmail }}</td>
+              <td>
+                <a
+                  class="button button-secondary button-small"
+                  [routerLink]="['/dashboard/students', enrollment()!.studentID]"
+                >
+                  View student
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td>Course</td>
+              <td>{{ enrollment()!.courseName }}</td>
+              <td>
+                {{ enrollment()!.fee | currency: 'INR' : 'symbol' : '1.0-2' }} -
+                {{ enrollment()!.durationWeeks }} weeks
+              </td>
+              <td>
+                <a
+                  class="button button-secondary button-small"
+                  [routerLink]="['/dashboard/courses', enrollment()!.courseID]"
+                >
+                  View course
+                </a>
+              </td>
+            </tr>
+          } @else {
+            <tr>
+              <td colspan="4" class="table-state">No enrollment details are available.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    </section>
+  }
+</main>

@@ -1,0 +1,163 @@
+<main class="page-shell dashboard-grid">
+  <app-page-header
+    activeSection="students"
+    eyebrow="Learner profile"
+    [title]="studentName()"
+    description="Review the learner account, current registrations, and course value in one place."
+    statusLabel="Profile status"
+    [statusTitle]="loading() ? 'Loading profile' : error() ? 'Needs attention' : 'Ready'"
+    statusDescription="Profiles connect student records with their course activity and enrollment history."
+    [showAdminAction]="authService.hasRole('Admin') && !!profile()"
+    [primaryActionLabel]="'Edit student'"
+    [primaryActionLink]="['/dashboard/students/edit', profile()?.studentID]"
+  />
+
+  @if (error()) {
+    <section class="status-banner status-error">{{ error() }}</section>
+  }
+
+  @if (!error()) {
+    <section class="surface section-card" [attr.aria-busy]="loading()">
+      @if (loading()) {
+        <app-skeleton-table [rows]="1" [cols]="3"></app-skeleton-table>
+      } @else if (profile()) {
+        <div class="metric-grid profile-metric-grid">
+        <article class="metric">
+          <span>Email</span>
+          <strong>{{ profile()!.email }}</strong>
+        </article>
+        <article class="metric">
+          <span>Courses</span>
+          <strong>{{ profile()!.totalCourses }}</strong>
+        </article>
+        <article class="metric">
+          <span>Total fees</span>
+          <strong>{{ profile()!.totalFees | currency: 'INR' : 'symbol' : '1.0-2' }}</strong>
+        </article>
+        <article class="metric">
+          <span>Joined</span>
+          <strong>{{ profile()!.createdAt | date: 'mediumDate' }}</strong>
+        </article>
+        <article class="metric">
+          <span>First enrollment</span>
+          <strong>
+            {{ profile()!.firstEnrollmentDate ? (profile()!.firstEnrollmentDate | date: 'mediumDate') : 'Not enrolled' }}
+          </strong>
+        </article>
+        <article class="metric">
+          <span>Recent enrollment</span>
+          <strong>
+            {{ profile()!.lastEnrollmentDate ? (profile()!.lastEnrollmentDate | date: 'mediumDate') : 'Not enrolled' }}
+          </strong>
+        </article>
+        </div>
+      }
+    </section>
+
+    <section class="surface table-section">
+    <div class="section-header">
+      <div>
+        <p class="badge">Recent activity</p>
+        <h2>Student timeline</h2>
+      </div>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Activity</th>
+            <th>Details</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading()) {
+            <tr>
+              <td colspan="3">
+                <app-skeleton-table [rows]="3" [cols]="3"></app-skeleton-table>
+              </td>
+            </tr>
+          } @else if ((profile()?.recentActivity?.length ?? 0) === 0) {
+            <tr>
+              <td colspan="3" class="table-state">No activity is available for this student yet.</td>
+            </tr>
+          } @else {
+            @for (activity of profile()!.recentActivity; track activity.activityType + activity.activityDate) {
+              <tr>
+                <td>{{ activity.activityType }}</td>
+                <td>{{ activity.description }}</td>
+                <td>{{ activity.activityDate | date: 'mediumDate' }}</td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+    </section>
+
+    <section class="surface table-section">
+    <div class="section-header">
+      <div>
+        <p class="badge">Enrollment history</p>
+        <h2>Registered courses</h2>
+      </div>
+
+      <a class="button button-secondary" routerLink="/dashboard/students">Back to students</a>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Enrollment</th>
+            <th>Course</th>
+            <th>Fee</th>
+            <th>Duration</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @if (loading()) {
+            <tr>
+              <td colspan="6">
+                <app-skeleton-table [rows]="4" [cols]="6"></app-skeleton-table>
+              </td>
+            </tr>
+          } @else if (!hasEnrollments()) {
+            <tr>
+              <td colspan="6" class="table-state">This student is not enrolled in any courses yet.</td>
+            </tr>
+          } @else {
+            @for (enrollment of profile()!.enrollments; track enrollment.enrollmentID) {
+              <tr>
+                <td>{{ enrollment.enrollmentID }}</td>
+                <td>{{ enrollment.courseName }}</td>
+                <td>{{ enrollment.fee | currency: 'INR' : 'symbol' : '1.0-2' }}</td>
+                <td>{{ enrollment.durationWeeks }} weeks</td>
+                <td>{{ enrollment.enrollmentDate | date: 'mediumDate' }}</td>
+                <td class="table-actions">
+                  <a
+                    class="button button-secondary button-small"
+                    [routerLink]="['/dashboard/courses', enrollment.courseID]"
+                  >
+                    Course
+                  </a>
+                  <a
+                    class="button button-secondary button-small"
+                    [routerLink]="['/dashboard/enrollments', enrollment.enrollmentID]"
+                  >
+                    Enrollment
+                  </a>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+    </section>
+  }
+</main>

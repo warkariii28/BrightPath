@@ -129,6 +129,22 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
 }
 
+.dashboard-metric-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.profile-metric-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+
+.dashboard-module-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.workspace-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .metric {
   position: relative;
   overflow: hidden;
@@ -146,7 +162,16 @@
 
 .module-card {
   display: grid;
+  align-content: start;
   gap: var(--space-4);
+}
+
+a.module-card {
+  color: var(--color-text);
+}
+
+a.module-card:hover {
+  opacity: 1;
 }
 
 .module-actions {
@@ -171,8 +196,9 @@
 
 .metric strong {
   display: block;
-  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-size: 1.75rem;
   line-height: 1.05;
+  overflow-wrap: anywhere;
 }
 
 .field-error {
@@ -425,11 +451,11 @@
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .table-actions > * {
-  min-width: 0;
+  min-width: 5.5rem;
 }
 
 /*DIAGRAM*/
@@ -456,7 +482,7 @@
 .project-visual-card strong {
   color: var(--color-text);
   font-family: var(--font-display);
-  font-size: clamp(1.15rem, 1.7vw, 1.55rem);
+  font-size: 1.35rem;
   line-height: 1.2;
 }
 
@@ -474,7 +500,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(0.35rem, 1.2vw, 0.85rem);
+  padding: 0.75rem;
   border: var(--border-default);
   border-radius: var(--radius-lg);
   background: var(--surface-elevated);
@@ -494,7 +520,7 @@
 
 .project-diagram-compact {
   max-width: min(100%, 460px);
-  padding: clamp(0.25rem, 0.9vw, 0.65rem);
+  padding: 0.55rem;
 }
 
 .project-diagram__image {
@@ -518,10 +544,20 @@
   color: var(--color-text-muted);
   font-size: 0.95rem;
   font-weight: var(--font-weight-bold);
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 991.98px) {
+  .dashboard-metric-grid,
+  .workspace-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-module-grid {
+    grid-template-columns: 1fr;
+  }
+
   .metric-grid {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
   }
@@ -574,7 +610,18 @@
 
   .table-actions .button + .button {
     margin-left: 0;
-    margin-top: 0.5rem;
+    margin-top: 0;
+  }
+
+  .dashboard-metric-grid,
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metric,
+  .module-card,
+  .mini-panel {
+    padding: var(--space-4);
   }
 
   .auth-side-visual {
@@ -597,6 +644,19 @@
   .page-copy {
     font-size: 0.96rem;
     line-height: 1.65;
+  }
+
+  .metric strong {
+    font-size: 1.45rem;
+  }
+
+  .table-actions {
+    justify-content: stretch;
+  }
+
+  .table-actions > * {
+    flex: 1 1 100%;
+    min-width: 0;
   }
 
   .project-diagram {

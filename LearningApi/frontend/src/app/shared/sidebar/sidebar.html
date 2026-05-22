@@ -33,6 +33,16 @@
       [routerLinkActiveOptions]="{ exact: true }"
       (click)="closeSidebar()"
     >
+      <lucide-icon [img]="LayoutDashboard" class="app-sidebar__icon"></lucide-icon>
+      <span>Dashboard</span>
+    </a>
+
+    <a
+      class="app-sidebar__link"
+      routerLink="/dashboard/students"
+      routerLinkActive="app-sidebar__link-active"
+      (click)="closeSidebar()"
+    >
       <lucide-icon [img]="Users" class="app-sidebar__icon"></lucide-icon>
       <span>Students</span>
     </a>
@@ -106,7 +116,7 @@
       <p class="sidebar-card__title">Quick Actions</p>
       <div class="sidebar-actions">
         @if (authService.hasRole('Admin')) {
-          <a routerLink="/dashboard/add" (click)="closeSidebar()">
+          <a routerLink="/dashboard/students/add" (click)="closeSidebar()">
             <lucide-icon [img]="Plus" class="app-sidebar__icon"></lucide-icon>
             Student
           </a>
