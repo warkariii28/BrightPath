@@ -188,3 +188,95 @@ BEGIN
         (56, 27, SYSUTCDATETIME());
 END;
 GO
+
+-- Supplemental demo data for dashboards and ID detail pages.
+-- This section is idempotent and works even when tables already contain partial data.
+DECLARE @DemoStudents TABLE (Name NVARCHAR(100), Email NVARCHAR(256));
+INSERT INTO @DemoStudents (Name, Email)
+VALUES
+    (N'Atharv Warkari', N'atharv@email.com'),
+    (N'Radhika Dixit', N'radhika@email.com'),
+    (N'Amey Datar', N'amey@email.com'),
+    (N'Anushka Shalu', N'anushka@email.com'),
+    (N'Srushti More', N'srushti@email.com');
+
+INSERT INTO dbo.Students (Name, Email)
+SELECT d.Name, d.Email
+FROM @DemoStudents d
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM dbo.Students s
+    WHERE s.Email = d.Email
+);
+
+DECLARE @DemoCourses TABLE (CourseName NVARCHAR(200), Fee DECIMAL(18,2), DurationWeeks INT);
+INSERT INTO @DemoCourses (CourseName, Fee, DurationWeeks)
+VALUES
+    (N'Python Fundamentals', 3999.00, 8),
+    (N'SQL Fundamentals', 4999.00, 8),
+    (N'ASP.NET Core Web API', 8999.00, 8),
+    (N'Angular Fundamentals', 6999.00, 6),
+    (N'Full Stack Project Workshop', 15999.00, 10);
+
+INSERT INTO dbo.Courses (CourseName, Fee, DurationWeeks)
+SELECT d.CourseName, d.Fee, d.DurationWeeks
+FROM @DemoCourses d
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM dbo.Courses c
+    WHERE c.CourseName = d.CourseName
+);
+
+DECLARE @DemoEnrollments TABLE (StudentEmail NVARCHAR(256), CourseName NVARCHAR(200), DaysAgo INT);
+INSERT INTO @DemoEnrollments (StudentEmail, CourseName, DaysAgo)
+VALUES
+    (N'atharv@email.com', N'Python Fundamentals', 1),
+    (N'atharv@email.com', N'SQL Fundamentals', 3),
+    (N'atharv@email.com', N'ASP.NET Core Web API', 8),
+    (N'radhika@email.com', N'Angular Fundamentals', 2),
+    (N'radhika@email.com', N'Full Stack Project Workshop', 12),
+    (N'amey@email.com', N'Python Fundamentals', 5),
+    (N'anushka@email.com', N'ASP.NET Core Web API', 4),
+    (N'srushti@email.com', N'Angular Fundamentals', 7);
+
+INSERT INTO dbo.Enrollments (StudentID, CourseID, EnrollmentDate)
+SELECT
+    s.StudentID,
+    c.CourseID,
+    DATEADD(DAY, -d.DaysAgo, SYSUTCDATETIME())
+FROM @DemoEnrollments d
+    INNER JOIN dbo.Students s ON s.Email = d.StudentEmail
+    INNER JOIN dbo.Courses c ON c.CourseName = d.CourseName
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM dbo.Enrollments e
+    WHERE e.StudentID = s.StudentID
+      AND e.CourseID = c.CourseID
+);
+
+DECLARE @AdminUserID INT;
+
+SELECT TOP (1) @AdminUserID = UserID
+FROM dbo.Users
+WHERE Role = N'Admin'
+ORDER BY UserID;
+
+IF @AdminUserID IS NOT NULL
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM dbo.AdminAuditLogs
+        WHERE AdminUserID = @AdminUserID
+          AND Action = N'DemoSeed'
+          AND EntityName = N'Dashboard'
+    )
+    BEGIN
+        INSERT INTO dbo.AdminAuditLogs
+            (AdminUserID, Action, EntityName, EntityID, Details, IpAddress, CreatedAt)
+        VALUES
+            (@AdminUserID, N'DemoSeed', N'Dashboard', NULL, N'Demo records prepared for dashboard analytics', N'local-seed', SYSUTCDATETIME()),
+            (@AdminUserID, N'CreateEnrollment', N'Enrollment', NULL, N'Sample enrollment activity added', N'local-seed', DATEADD(DAY, -1, SYSUTCDATETIME())),
+            (@AdminUserID, N'UpdateCourse', N'Course', NULL, N'Sample course detail activity added', N'local-seed', DATEADD(DAY, -2, SYSUTCDATETIME()));
+    END;
+END;
+GO
