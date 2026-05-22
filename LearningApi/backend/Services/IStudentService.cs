@@ -8,6 +8,7 @@ public interface IStudentService
     List<StudentResponseDto> GetAll();
     PagedResultDto<StudentResponseDto> GetPaged(int page, int pageSize,string? search);
     Student GetById(int id);
+    StudentProfileDto GetProfile(int id);
 
     int Add(Student student);
 

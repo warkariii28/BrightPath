@@ -55,6 +55,22 @@ public class CoursesController : ControllerBase
         return Ok(ResponseHelper.Success(course, "Course fetched successfully"));
     }
 
+    [HttpGet("{id}/profile")]
+    [ProducesResponseType(typeof(ApiResponse<CourseProfileDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public IActionResult GetProfile(int id)
+    {
+        if (id <= 0)
+        {
+            return BadRequest(ResponseHelper.Fail<object>("Invalid course ID"));
+        }
+
+        var profile = _service.GetProfile(id);
+        return Ok(ResponseHelper.Success(profile, "Course profile fetched successfully"));
+    }
+
     [Authorize(Roles = AppRoles.Admin)]
     [HttpPost]
     [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status201Created)]

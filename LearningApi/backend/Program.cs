@@ -40,6 +40,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
         );
     };
 });
+
 // Swagger base
 builder.Services.AddEndpointsApiExplorer();
 
@@ -53,6 +54,7 @@ builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 builder.Services.AddScoped<IAdminAuditLogRepository, AdminAuditLogRepository>();
+builder.Services.AddScoped<IDashboardAnalyticsRepository, DashboardAnalyticsRepository>();
 builder.Services.AddRateLimiter(options =>
 {
     options.AddPolicy("AuthPolicy", context =>
@@ -124,12 +126,12 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Learning API",
+        Title = "BrightPath",
         Version = "v1",
         Description = "ASP.NET Core Web API for managing students, courses, enrollments, JWT authentication, refresh tokens, and role-based admin workflows.",
         Contact = new OpenApiContact
         {
-            Name = "Learning API Maintainer"
+            Name = "BrightPath Maintainer"
         }
     });
 

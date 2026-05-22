@@ -39,6 +39,22 @@ public class EnrollmentsController : ControllerBase
         return Ok(ResponseHelper.Success(data, "Enrollments fetched successfully"));
     }
 
+    [HttpGet("{id}")]
+    [ProducesResponseType(typeof(ApiResponse<EnrollmentDetailDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public IActionResult GetById(int id)
+    {
+        if (id <= 0)
+        {
+            return BadRequest(ResponseHelper.Fail<object>("Invalid enrollment ID"));
+        }
+
+        var enrollment = _service.GetById(id);
+        return Ok(ResponseHelper.Success(enrollment, "Enrollment fetched successfully"));
+    }
+
     [Authorize(Roles = AppRoles.Admin)]
     [HttpPost]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status201Created)]

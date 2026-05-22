@@ -86,6 +86,66 @@ public class EnrollmentRepository : IEnrollmentRepository
         };
     }
 
+    public EnrollmentDetailDto? GetById(int id)
+    {
+        using SqlConnection conn = new SqlConnection(_conn);
+        using SqlCommand cmd = new SqlCommand("GetEnrollmentByID", conn);
+
+        cmd.CommandTimeout = 30;
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.Parameters.Add("@EnrollmentID", SqlDbType.Int).Value = id;
+
+        conn.Open();
+
+        using SqlDataReader reader = cmd.ExecuteReader();
+
+        if (!reader.Read())
+            return null;
+
+        return new EnrollmentDetailDto
+        {
+            EnrollmentID = Convert.ToInt32(reader["EnrollmentID"]),
+            StudentID = Convert.ToInt32(reader["StudentID"]),
+            StudentName = reader["StudentName"]?.ToString() ?? "",
+            StudentEmail = reader["StudentEmail"]?.ToString() ?? "",
+            CourseID = Convert.ToInt32(reader["CourseID"]),
+            CourseName = reader["CourseName"]?.ToString() ?? "",
+            Fee = Convert.ToDecimal(reader["Fee"]),
+            DurationWeeks = Convert.ToInt32(reader["DurationWeeks"]),
+            EnrollmentDate = Convert.ToDateTime(reader["EnrollmentDate"]),
+            Status = ReadString(reader, "Status") ?? "Active",
+            AmountPaid = ReadDecimal(reader, "AmountPaid") ?? Convert.ToDecimal(reader["Fee"]),
+            BalanceDue = ReadDecimal(reader, "BalanceDue") ?? 0
+        };
+    }
+
+    private static string? ReadString(SqlDataReader reader, string columnName)
+    {
+        if (!HasColumn(reader, columnName) || reader[columnName] == DBNull.Value)
+            return null;
+
+        return reader[columnName]?.ToString();
+    }
+
+    private static decimal? ReadDecimal(SqlDataReader reader, string columnName)
+    {
+        if (!HasColumn(reader, columnName) || reader[columnName] == DBNull.Value)
+            return null;
+
+        return Convert.ToDecimal(reader[columnName]);
+    }
+
+    private static bool HasColumn(SqlDataReader reader, string columnName)
+    {
+        for (var index = 0; index < reader.FieldCount; index++)
+        {
+            if (string.Equals(reader.GetName(index), columnName, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
+    }
+
     public void Add(Enrollment enrollment)
     {
         using SqlConnection conn = new SqlConnection(_conn);

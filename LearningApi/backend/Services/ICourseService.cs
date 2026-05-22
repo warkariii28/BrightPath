@@ -9,6 +9,7 @@ public interface ICourseService
     PagedResultDto<CourseResponseDto> GetPaged(int page, int pageSize,string? search);
 
     Course GetById(int id);
+    CourseProfileDto GetProfile(int id);
 
     int Add(Course course);
 

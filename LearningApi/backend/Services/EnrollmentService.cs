@@ -24,6 +24,19 @@ public class EnrollmentService : IEnrollmentService
         return _repo.GetPaged(page, pageSize,search);
     }
 
+    public EnrollmentDetailDto GetById(int id)
+    {
+        if (id <= 0)
+            throw new BadRequestException("Invalid ID");
+
+        var enrollment = _repo.GetById(id);
+
+        if (enrollment is null)
+            throw new NotFoundException("Enrollment not found");
+
+        return enrollment;
+    }
+
     public void Add(Enrollment enrollment)
     {
         _repo.Add(enrollment);

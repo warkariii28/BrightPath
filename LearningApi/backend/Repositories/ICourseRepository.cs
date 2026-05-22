@@ -11,5 +11,6 @@ public interface ICourseRepository
     bool Delete(int id);
 
     Course? GetById(int id);
+    CourseProfileDto? GetProfile(int id);
     bool Update(Course course);
 }

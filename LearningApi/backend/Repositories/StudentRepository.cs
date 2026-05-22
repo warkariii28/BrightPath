@@ -107,6 +107,97 @@ public class StudentRepository : IStudentRepository
         };
     }
 
+    public StudentProfileDto? GetProfile(int id)
+    {
+        using SqlConnection conn = new SqlConnection(_conn);
+        using SqlCommand cmd = new SqlCommand("GetStudentProfile", conn);
+
+        cmd.CommandTimeout = 30;
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.Parameters.Add("@StudentID", SqlDbType.Int).Value = id;
+
+        conn.Open();
+
+        using SqlDataReader reader = cmd.ExecuteReader();
+
+        if (!reader.Read())
+            return null;
+
+        var profile = new StudentProfileDto
+        {
+            StudentID = Convert.ToInt32(reader["StudentID"]),
+            Name = reader["Name"]?.ToString() ?? "",
+            Email = reader["Email"]?.ToString() ?? "",
+            CreatedAt = ReadDateTime(reader, "CreatedAt") ?? DateTime.UtcNow
+        };
+
+        if (reader.NextResult())
+        {
+            while (reader.Read())
+            {
+                profile.Enrollments.Add(new StudentProfileEnrollmentDto
+                {
+                    EnrollmentID = Convert.ToInt32(reader["EnrollmentID"]),
+                    CourseID = Convert.ToInt32(reader["CourseID"]),
+                    CourseName = reader["CourseName"]?.ToString() ?? "",
+                    Fee = Convert.ToDecimal(reader["Fee"]),
+                    DurationWeeks = Convert.ToInt32(reader["DurationWeeks"]),
+                    EnrollmentDate = Convert.ToDateTime(reader["EnrollmentDate"])
+                });
+            }
+        }
+
+        profile.TotalCourses = profile.Enrollments.Count;
+        profile.TotalFees = profile.Enrollments.Sum(e => e.Fee);
+        profile.FirstEnrollmentDate = profile.Enrollments.Count == 0
+            ? null
+            : profile.Enrollments.Min(e => e.EnrollmentDate);
+        profile.LastEnrollmentDate = profile.Enrollments.Count == 0
+            ? null
+            : profile.Enrollments.Max(e => e.EnrollmentDate);
+        profile.RecentActivity.Add(new StudentActivityDto
+        {
+            ActivityType = "ProfileCreated",
+            Description = $"Student profile created for {profile.Name}",
+            ActivityDate = profile.CreatedAt
+        });
+
+        foreach (var enrollment in profile.Enrollments.Take(5))
+        {
+            profile.RecentActivity.Add(new StudentActivityDto
+            {
+                ActivityType = "EnrollmentCreated",
+                Description = $"Enrolled in {enrollment.CourseName}",
+                ActivityDate = enrollment.EnrollmentDate
+            });
+        }
+
+        profile.RecentActivity = profile.RecentActivity
+            .OrderByDescending(a => a.ActivityDate)
+            .ToList();
+
+        return profile;
+    }
+
+    private static DateTime? ReadDateTime(SqlDataReader reader, string columnName)
+    {
+        if (!HasColumn(reader, columnName) || reader[columnName] == DBNull.Value)
+            return null;
+
+        return Convert.ToDateTime(reader[columnName]);
+    }
+
+    private static bool HasColumn(SqlDataReader reader, string columnName)
+    {
+        for (var index = 0; index < reader.FieldCount; index++)
+        {
+            if (string.Equals(reader.GetName(index), columnName, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
+    }
+
     public int Add(Student student)
     {
         using SqlConnection conn = new SqlConnection(_conn);

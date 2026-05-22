@@ -34,6 +34,19 @@ public class CourseService : ICourseService
         return course;
     }
 
+    public CourseProfileDto GetProfile(int id)
+    {
+        if (id <= 0)
+            throw new BadRequestException("Invalid ID");
+
+        var profile = _repo.GetProfile(id);
+
+        if (profile == null)
+            throw new NotFoundException("Course not found");
+
+        return profile;
+    }
+
     public int Add(Course course)
     {
         return _repo.Add(course);

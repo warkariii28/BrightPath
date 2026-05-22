@@ -14,4 +14,11 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="artifacts\**;bin\**;obj\**;..\artifacts\**" />
+    <Content Remove="artifacts\**;bin\**;obj\**;..\artifacts\**" />
+    <EmbeddedResource Remove="artifacts\**;bin\**;obj\**;..\artifacts\**" />
+    <None Remove="artifacts\**;bin\**;obj\**;..\artifacts\**" />
+  </ItemGroup>
+
 </Project>
