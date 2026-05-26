@@ -45,6 +45,9 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 builder.Services.AddEndpointsApiExplorer();
 
 // Dependency Injection
+
+/* AddScoped = one instance per HTTP request
+reated fresh per request, shared within that request — the right lifetime for DB contexts and unit-of-work patterns. */
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
@@ -72,7 +75,7 @@ builder.Services.AddRateLimiter(options =>
 });
 
 
-// CORS
+// CORS = Cross origin Resource Sharing
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AngularApp", policy =>
