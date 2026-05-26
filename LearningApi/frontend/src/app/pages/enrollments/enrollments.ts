@@ -12,7 +12,7 @@ import { getPaginationItems } from '../../core/utils/paginate';
 
 @Component({
   selector: 'app-enrollments',
-  imports: [DatePipe, RouterLink, SkeletonTableComponent, PageHeaderComponent],
+  imports: [DatePipe,RouterLink, SkeletonTableComponent, PageHeaderComponent],
   templateUrl: './enrollments.html',
 })
 export class Enrollments implements OnInit {
